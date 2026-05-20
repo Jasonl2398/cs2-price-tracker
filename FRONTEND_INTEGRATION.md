@@ -28,7 +28,7 @@ https://cs2-api.suryapratap.in
     <div id="app"></div>
     <script>
       // API Configuration
-      const API_BASE_URL = "https://cs2-api.suryapratap.in";
+      const API_BASE_URL = "http://localhost:3001";
 
       // Example: Create a user
       async function createUser(discordWebhook) {

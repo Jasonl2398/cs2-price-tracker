@@ -157,7 +157,7 @@ export async function getSkinPrice(skinName) {
         Accept: "application/json,text/plain,*/*",
         "Accept-Language": "en-IN,en;q=0.9",
         Referer: "https://steamcommunity.com/market/",
-        Cookie: "steamCountry=IN|INR"
+        Cookie: "steamCountry=US|USD"
       }
     });
 

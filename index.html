@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS2 Price Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --border: #1e2330;
+      --border-bright: #2e3550;
+      --accent: #e8b84b;
+      --accent-dim: rgba(232, 184, 75, 0.12);
+      --accent-glow: rgba(232, 184, 75, 0.25);
+      --red: #e84b4b;
+      --green: #4be87a;
+      --text: #c8cdd8;
+      --text-dim: #5a6070;
+      --text-bright: #eef0f5;
+      --mono: 'JetBrains Mono', monospace;
+      --display: 'Rajdhani', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--display);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(232,184,75,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232,184,75,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .logo-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .logo-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-bright);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .logo-title span { color: var(--accent); }
+
+    .user-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .user-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .user-id {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      cursor: pointer;
+      border: 1px solid var(--border-bright);
+      padding: 4px 10px;
+      border-radius: 3px;
+      transition: background 0.15s;
+    }
+
+    .user-id:hover { background: var(--accent-dim); }
+
+    /* Setup panel */
+    .setup-panel {
+      background: var(--surface);
+      border: 1px solid var(--border-bright);
+      border-radius: 6px;
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .setup-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      font-family: var(--mono);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    input {
+      background: var(--bg);
+      border: 1px solid var(--border-bright);
+      color: var(--text-bright);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    input::placeholder { color: var(--text-dim); }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 4px;
+      padding: 11px 22px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0c10;
+    }
+
+    .btn-primary:hover { background: #f0c85a; box-shadow: 0 0 16px var(--accent-glow); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--border-bright);
+    }
+
+    .btn-ghost:hover { color: var(--text-bright); border-color: var(--text-dim); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid rgba(232, 75, 75, 0.3);
+      font-size: 11px;
+      padding: 5px 10px;
+    }
+
+    .btn-danger:hover { background: rgba(232,75,75,0.1); }
+
+    /* Add tracker form */
+    .add-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      display: none;
+    }
+
+    .add-form.visible { display: block; animation: slideDown 0.2s ease; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* Section header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-bright);
+      letter-spacing: 0.05em;
+    }
+
+    .tracker-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* Tracker cards */
+    #trackers-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .tracker-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.2s;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tracker-card:hover { border-color: var(--border-bright); }
+
+    .tracker-info { display: flex; flex-direction: column; gap: 6px; }
+
+    .tracker-skin {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-bright);
+      letter-spacing: 0.02em;
+    }
+
+    .tracker-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .price-tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .price-tag .label { color: var(--text-dim); }
+
+    .price-tag .value { font-weight: 500; }
+    .price-tag.down .value { color: var(--green); }
+    .price-tag.up .value { color: var(--red); }
+
+    .divider {
+      width: 1px;
+      height: 12px;
+      background: var(--border-bright);
+    }
+
+    .last-price {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .last-price span { color: var(--accent); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .empty-text {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border-bright);
+      border-radius: 6px;
+      padding: 14px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 320px;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error { border-left: 3px solid var(--red); }
+
+    /* Status dot */
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Loading shimmer */
+    .shimmer {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 4px;
+      height: 70px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .user-badge { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+      <span class="logo-eyebrow">Steam Market</span>
+      <h1 class="logo-title">CS2 <span>Price</span> Tracker</h1>
+    </div>
+    <div class="user-badge" id="user-badge" style="display:none">
+      <span class="user-label">User ID</span>
+      <span class="user-id" id="user-id-display" title="Click to copy"></span>
+    </div>
+  </header>
+
+  <!-- Setup: create or recover user -->
+  <!-- Need to add way to login using userId -->
+  <div class="setup-panel" id="setup-panel">
+    <div class="panel-title">// Connect your account</div>
+    <div class="field-row">
+      <div class="field">
+        <label for="webhook-input">Discord Webhook URL</label>
+        <input type="url" id="webhook-input" placeholder="https://discord.com/api/webhooks/..." />
+      </div>
+      <button class="btn btn-primary" id="connect-btn" onclick="handleConnect()">Connect</button>
+    </div>
+
+    <div class="field-row" style="padding-top: 30px;">
+      <div class="field">
+        <label for="userId-input">Connect with user ID:</label>
+        <input type="text" id="userId-input" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"/>
+      </div>
+      <button class="btn btn-primary" id="connect-btn" onclick="handleUIDConnect()">Connect</button>
+    </div>
+    
+    <p style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:12px;">
+      Already have an account? Entering your user ID or original webhook URL will recover it.
+    </p>
+  </div>
+
+
+  <!-- Add tracker section -->
+  <div id="tracker-section" style="display:none">
+    <div class="section-header">
+      <span class="section-title">Trackers</span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="tracker-count" id="tracker-count">0 active</span>
+        <button class="btn btn-primary" onclick="toggleForm()">+ Add Tracker</button>
+      </div>
+    </div>
+
+    <!-- Add form -->
+    <div class="add-form" id="add-form">
+      <div class="panel-title">// New Tracker</div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="skin-name">Skin Name</label>
+          <input type="text" id="skin-name" placeholder="AK-47 | Redline (Field-Tested)" />
+        </div>
+        <div class="field">
+          <label for="target-down">Buy Below (¢)</label>
+          <input type="number" id="target-down" placeholder="1800" min="0" />
+        </div>
+        <div class="field">
+          <label for="target-up">Sell Above (¢)</label>
+          <input type="number" id="target-up" placeholder="2500" min="0" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
+        <button class="btn btn-primary" id="add-btn" onclick="handleAddTracker()">Add Tracker</button>
+      </div>
+    </div>
+
+    <!-- Trackers list -->
+    <div id="trackers-list"></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const API_BASE_URL = "http://localhost:3001";
+  let currentUserId = localStorage.getItem("cs2_userId") || null;
+
+  // --- Init ---
+  window.addEventListener("DOMContentLoaded", () => {
+    if (currentUserId) {
+      showTrackerSection();
+      loadTrackers();
+    }
+  });
+
+  // --- UI helpers ---
+  function showTrackerSection() {
+    document.getElementById("setup-panel").style.display = "none";
+    document.getElementById("tracker-section").style.display = "block";
+    document.getElementById("user-badge").style.display = "flex";
+    const el = document.getElementById("user-id-display");
+    el.textContent = currentUserId.slice(0, 8) + "…";
+    el.title = "Click to copy: " + currentUserId;
+    el.onclick = () => {
+      navigator.clipboard.writeText(currentUserId);
+      toast("User ID copied!", "success");
+    };
+  }
+
+  function toggleForm() {
+    const form = document.getElementById("add-form");
+    form.classList.toggle("visible");
+    if (form.classList.contains("visible")) {
+      document.getElementById("skin-name").focus();
+    }
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.textContent = loading ? "…" : btn.dataset.label || btn.textContent;
+  }
+
+  function toast(msg, type = "success") {
+    const el = document.getElementById("toast");
+    const dot = type === "success" ? "✓" : "✕";
+    el.innerHTML = `<span style="color:${type==='success'?'var(--green)':'var(--red)'}">${dot}</span> ${msg}`;
+    el.className = `toast ${type} show`;
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.classList.remove("show"), 3000);
+  }
+
+  // --- API ---
+  // API_BASE_URL = "http://localhost:3001"
+  async function api(path, options = {}) {
+    const res = await fetch(`${API_BASE_URL}${path}`, {
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      ...options
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Request failed");
+    return data;
+  }
+
+  // --- Connect / recover user ---
+  // API_BASE_URL = "http://localhost:3001"
+  async function handleConnect() {
+    const webhook = document.getElementById("webhook-input").value.trim();
+    if (!webhook) return toast("Please enter a webhook URL", "error");
+
+    const btn = document.getElementById("connect-btn");
+    btn.disabled = true;
+    btn.textContent = "Connecting…";
+
+    try {
+      // Try recover first, then create
+      let data;
+      try {
+        data = await api("/user/recover", {
+          method: "POST",
+          body: JSON.stringify({ discordWebhook: webhook })
+        });
+        toast("Account recovered!", "success");
+      } catch {
+        data = await api("/user", {
+          method: "POST",
+          body: JSON.stringify({ discordWebhook: webhook })
+        });
+        toast("Account created!", "success");
+      }
+
+      currentUserId = data.userId;
+      localStorage.setItem("cs2_userId", currentUserId);
+      showTrackerSection();
+      loadTrackers();
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Connect";
+    }
+  }
+
+  // -- Connect with User ID ---
+  async function handleUIDConnect() {
+    const userId = document.getElementById("userId-input").value.trim();
+    if (!userId) {
+      return toast("Please enter a valid user ID", "error");
+    }
+
+    try {
+      let data;
+      console.log(`/user/${userId}`);
+      data = await api(`/user/${userId}`, {
+        method: "GET"
+      });
+
+      currentUserId = data.userId;
+      localStorage.setItem("cs2_userId", currentUserId);
+      showTrackerSection();
+      loadTrackers();
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  }
+
+  // --- Load trackers ---
+  async function loadTrackers() {
+    const list = document.getElementById("trackers-list");
+    list.innerHTML = `<div class="shimmer"></div><div class="shimmer" style="margin-top:10px"></div>`;
+
+    try {
+      const data = await api(`/track?userId=${currentUserId}`);
+      renderTrackers(data.trackers || data);
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-text">Failed to load trackers</div></div>`;
+      toast(err.message, "error");
+    }
+  }
+
+  function renderTrackers(trackers) {
+    const list = document.getElementById("trackers-list");
+    const count = document.getElementById("tracker-count");
+    count.textContent = `${trackers.length} active`;
+
+    if (!trackers.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⊘</div>
+          <div class="empty-text">No trackers yet — add one above</div>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = trackers.map(t => `
+      <div class="tracker-card" id="card-${t._id}">
+        <div class="tracker-info">
+          <div class="tracker-skin">${escHtml(t.skinName)}</div>
+          <div class="tracker-meta">
+            <div class="price-tag down">
+              <span class="label">Buy ↓</span>
+              <span class="value">${formatPrice(t.targetDown)}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="price-tag up">
+              <span class="label">Sell ↑</span>
+              <span class="value">${formatPrice(t.targetUp)}</span>
+            </div>
+            ${t.lastKnownPrice ? `
+              <div class="divider"></div>
+              <div class="last-price">Latest: <span>${formatPrice(t.lastKnownPrice)}</span></div>
+            ` : ''}
+            <div class="divider"></div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <div class="status-dot"></div>
+              <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">tracking</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-danger" onclick="handleDelete('${t._id}')">Remove</button>
+      </div>
+    `).join("");
+  }
+
+  // --- Add tracker ---
+  async function handleAddTracker() {
+    const skinName = document.getElementById("skin-name").value.trim();
+    const targetDown = parseInt(document.getElementById("target-down").value);
+    const targetUp = parseInt(document.getElementById("target-up").value);
+
+    if (!skinName) return toast("Enter a skin name", "error");
+    if (!targetDown || !targetUp) return toast("Enter both price targets", "error");
+    if (targetDown >= targetUp) return toast("Buy target must be below sell target", "error");
+
+    const btn = document.getElementById("add-btn");
+    btn.disabled = true; btn.textContent = "Adding…";
+
+    try {
+      await api("/track", {
+        method: "POST",
+        body: JSON.stringify({ userId: currentUserId, skinName, targetDown, targetUp, interest: "buy" })
+      });
+
+      toast(`Tracker added for ${skinName}`, "success");
+      document.getElementById("skin-name").value = "";
+      document.getElementById("target-down").value = "";
+      document.getElementById("target-up").value = "";
+      toggleForm();
+      loadTrackers();
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      btn.disabled = false; 
+      btn.textContent = "Add Tracker";
+    }
+  }
+
+  // --- Delete tracker ---
+  async function handleDelete(trackerId) {
+    const card = document.getElementById(`card-${trackerId}`);
+    card.style.opacity = "0.4";
+    try {
+      await api(`/track/${trackerId}?userId=${currentUserId}`, { method: "DELETE" });
+      toast("Tracker removed", "success");
+      loadTrackers();
+    } catch (err) {
+      card.style.opacity = "1";
+      toast(err.message, "error");
+    }
+  }
+
+  // --- Helpers ---
+  function formatPrice(cents) {
+    if (!cents && cents !== 0) return "—";
+    return "$" + (cents / 100).toFixed(2);
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+</script>
+</body>
+</html>

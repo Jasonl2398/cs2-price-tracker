@@ -67,8 +67,9 @@ async function runPriceCheck() {
     try {
       console.log(`[${new Date().toISOString()}] Steam request → ${skinName}`);
       const price = await getSkinPrice(skinName);
+      const priceConverted = price / 100;
       priceCache.set(skinName, price);
-      console.log(`✔ ${skinName}: ${price}`);
+      console.log(`✔ ${skinName}: ${priceConverted}`);
     } catch (err) {
       console.error(`✖ Failed price fetch: ${skinName}`);
       priceCache.set(skinName, null);

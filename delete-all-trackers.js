@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Tracker from "./src/models/tracker.js";
+import dns from "node:dns";
 
-dotenv.config();
+dotenv.config({debug:true, path:".env.development"}); // load development .env file
+dns.setServers(["1.1.1.1","8.8.8.8"]); // Cloudflare & Google DNS (querySrv error workaround)
 
 async function deleteAllTrackers() {
   try {

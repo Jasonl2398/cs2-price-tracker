@@ -8,6 +8,7 @@ import userRouter from "./src/routes/user.js";
 import utilityRouter from "./src/routes/utility.js";
 import startCron from "./src/cron/priceCheck.js";
 import { generalLimiter } from "./src/middleware/rateLimiter.js";
+import dns from "node:dns";
 
 // Load environment variables based on NODE_ENV
 const nodeEnv = process.env.NODE_ENV || "development";
@@ -38,10 +39,13 @@ app.set("trust proxy", 1);
 
 // CORS configuration - allows requests from frontend domain and local development
 const allowedOrigins = [
-  "https://suryapratap.in",
-  "https://www.suryapratap.in", // www variant
-  "http://192.168.1.11:5173", // Local development
-  "https://cs2-api.suryapratap.in",
+  //"https://suryapratap.in",
+  //"https://www.suryapratap.in", // www variant
+  //"http://192.168.50.57:3001", // Local development
+  "http://localhost:3001", // Local development, backend
+  "http://localhost:3000", // Local development, frontend
+  //"null",
+  //"https://cs2-api.suryapratap.in",
   // Add your Cloudflare Tunnel subdomain or API subdomain here
   // Example: "https://cs2-api.suryapratap.in"
   ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [])
@@ -87,6 +91,7 @@ const PORT = process.env.PORT || 3001;
 
 async function start() {
   try {
+    dns.setServers(["1.1.1.1","8.8.8.8"]); // Cloudflare & Google DNS
     if (!process.env.MONGODB_URI) {
       throw new Error("MONGODB_URI environment variable is required");
     }
