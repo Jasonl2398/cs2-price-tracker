@@ -1,0 +1,30 @@
+# BUILD
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+copy package*.json ./
+RUN npm ci
+#RUN npm ci --omit=dev
+
+# RUNTIME
+from node:20-alpine
+
+# tini for parent process (PID 1)
+RUN apk add --no-cache tini 
+
+WORKDIR  /app
+
+COPY --from=builder /app/node_modules ./node_modules
+
+COPY package.json
+COPY server.js ./
+COPY src/ ./src/
+
+# Non-root user for security
+RUN addgroup -S usergroup && adduser -S appuser -G appgroup
+USER appuser
+
+EXPOSE 3001
+
+ENTRYPOINT ["/sbin/tini", "--"]
+cmd ["node", "server.js"]

@@ -1,11 +1,12 @@
 
-
 FROM nginx:alpine
 
+# Remove default nginx html and copy our index.html
 RUN rm /usr/share/nginx/html/*
-
 COPY index.html /usr/share/nginx/html/index.html
 
+# Copy our nginx.conf
 COPY nginx.conf /etc/nginx/conf/default.conf
 
-EXPOSE 80
+# Front-end listens on port 3000
+EXPOSE 3000
