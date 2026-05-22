@@ -1,0 +1,11 @@
+
+
+FROM nginx:alpine
+
+RUN rm /usr/share/nginx/html/*
+
+COPY index.html /usr/share/nginx/html/index.html
+
+COPY nginx.conf /etc/nginx/conf/default.conf
+
+EXPOSE 80
