@@ -563,7 +563,7 @@
   }
 
   // --- API ---
-  // API_BASE_URL = "http://localhost:3001"
+  // API_BASE_URL = "/api";
   async function api(path, options = {}) {
     const res = await fetch(`${API_BASE_URL}${path}`, {
       headers: { "Content-Type": "application/json" },

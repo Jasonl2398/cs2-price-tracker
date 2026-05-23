@@ -10,7 +10,7 @@ RUN npm ci
 from node:20-alpine
 
 # tini for parent process (PID 1)
-RUN apk add --no-cache tini wget 
+RUN apk add --no-cache tini wget curl
 
 WORKDIR /app
 
