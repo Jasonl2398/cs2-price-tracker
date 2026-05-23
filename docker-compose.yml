@@ -15,7 +15,7 @@ services:
     networks:
       - cs2tracker-net
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3001/track"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/user/04408607-505d-42bc-a9b9-db2ec518a3bb"]
       interval: 30s
       timeout: 5s
       retries: 3
