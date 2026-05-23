@@ -13,9 +13,9 @@ services:
     ports:
       - "3001:3001"
     networks:
-      -  cs2tracker-net
+      - cs2tracker-net
     healthcheck:
-      test: ["CMD", "wget", "-q0", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/track"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -33,7 +33,7 @@ services:
       backend:
         condition: service_healthy
     networks:
-      -  cs2tracker-net
+      - cs2tracker-net
       
 networks:
   cs2tracker-net:

@@ -10,9 +10,9 @@ RUN npm ci
 from node:20-alpine
 
 # tini for parent process (PID 1)
-RUN apk add --no-cache tini 
+RUN apk add --no-cache tini wget 
 
-WORKDIR  /app
+WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 
@@ -27,4 +27,5 @@ USER appuser
 EXPOSE 3001
 
 ENTRYPOINT ["/sbin/tini", "--"]
-cmd ["node", "server.js"]
+cmd ["npm","run","dev"]
+# cmd ["node", "server.js"]
