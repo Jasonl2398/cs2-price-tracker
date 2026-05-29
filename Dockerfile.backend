@@ -21,11 +21,11 @@ COPY server.js ./
 COPY src/ ./src/
 
 # Non-root user for security
-RUN addgroup -S usergroup && adduser -S appuser -G appgroup
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
 EXPOSE 3001
 
 ENTRYPOINT ["/sbin/tini", "--"]
 # cmd ["npm","run","dev"]
-cmd ["npm", "start"]
+CMD ["npm", "start"]
