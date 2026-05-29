@@ -27,5 +27,5 @@ USER appuser
 EXPOSE 3001
 
 ENTRYPOINT ["/sbin/tini", "--"]
-cmd ["npm","run","dev"]
-# cmd ["node", "server.js"]
+# cmd ["npm","run","dev"]
+cmd ["npm", "start"]
