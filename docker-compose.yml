@@ -7,9 +7,9 @@ services:
     container_name: cs2tracker-backend
     restart: unless-stopped
     env_file:
-      - .env.development
+      - .env.production
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
     ports:
       - "3001:3001"
     networks:
