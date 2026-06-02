@@ -1,0 +1,40 @@
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: cs2tracker-backend
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    networks:
+      - cs2tracker-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/user/04408607-505d-42bc-a9b9-db2ec518a3bb"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: cs2tracker-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - cs2tracker-net
+
+networks:
+  cs2tracker-net:
+    driver: bridge

@@ -1,0 +1,13 @@
+node_modules
+.env*
+.git
+.gitignore
+*.md
+docs/
+.vscode/
+.prettierrc
+.prettierignore
+ecosystem.config.cjs
+*.sh
+*.log
+CS2_Price_Tracker.postman_collection.json
