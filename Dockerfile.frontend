@@ -8,6 +8,6 @@ COPY index.html /usr/share/nginx/html/index.html
 # Copy our nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Front-end listens on port 3000
-EXPOSE 3000
+# Front-end listens on port 80
+EXPOSE 8080
 

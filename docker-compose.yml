@@ -28,13 +28,13 @@ services:
     container_name: cs2tracker-frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - cs2tracker-net
-      
+
 networks:
   cs2tracker-net:
     driver: bridge

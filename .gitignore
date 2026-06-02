@@ -53,3 +53,6 @@ temp/
 # Cloudflare Tunnel credentials
 .cloudflared/
 **/cloudflared/*.json
+
+# production nginx config file
+nginx.conf
