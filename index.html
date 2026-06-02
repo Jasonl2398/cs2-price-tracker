@@ -514,7 +514,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const API_BASE_URL = "/api"; // nginx proxy
+  const API_BASE_URL = "http://localhost:3001" //dev
+  //const API_BASE_URL = "/api"; // production
   let currentUserId = localStorage.getItem("cs2_userId") || null;
 
   // --- Init ---
@@ -683,11 +684,6 @@
               <div class="divider"></div>
               <div class="last-price">Latest: <span>${formatPrice(t.lastKnownPrice)}</span></div>
             ` : ''}
-            <div class="divider"></div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <div class="status-dot"></div>
-              <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">tracking</span>
-            </div>
           </div>
         </div>
         <button class="btn btn-danger" onclick="handleDelete('${t._id}')">Remove</button>
